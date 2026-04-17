@@ -1,31 +1,152 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <title>LA TV Shows | Home</title>
-    <meta name="description" content="A Catalog of Shows Set in Los Angeles" />
+    <title>Mon Viet — Vietnamese Food Catalog</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="A catalog of classic Vietnamese dishes" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
-    <script type="text/javascript" src="scripts.js"></script>
   </head>
 
   <body>
+
+    <!-- HEADER -->
     <header class="main-header">
-      <h1 class="title">LA TV Shows</h1>
+      <div class="header-top">
+        <div class="header-title">
+          <span class="header-icon">🍜</span>
+          <div>
+            <h1 class="title">Mon Viet</h1>
+            <p class="subtitle">Vietnamese Food Catalog</p>
+          </div>
+        </div>
+
+        <!-- STATS BAR -->
+        <div class="stats-bar">
+          <div class="stat">
+            <span class="stat-value" id="stat-total">0</span>
+            <span class="stat-label">Dishes</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-value" id="stat-spice">0</span>
+            <span class="stat-label">Avg Spice</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-value" id="stat-favorites">0</span>
+            <span class="stat-label">Favorites</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTROLS -->
+      <div class="controls">
+        <input type="text" id="search-input" placeholder="Search dishes..." oninput="applyFilters()" />
+
+        <select id="region-filter" onchange="applyFilters()">
+          <option value="All">All Regions</option>
+          <option value="North">North</option>
+          <option value="Central">Central</option>
+          <option value="South">South</option>
+        </select>
+
+        <select id="type-filter" onchange="applyFilters()">
+          <option value="All">All Types</option>
+          <option value="Soup">Soup</option>
+          <option value="Noodles">Noodles</option>
+          <option value="Rice">Rice</option>
+          <option value="Street Food">Street Food</option>
+          <option value="Roll">Roll</option>
+          <option value="Sandwich">Sandwich</option>
+        </select>
+
+        <select id="sort-select" onchange="applyFilters()">
+          <option value="default">Sort: Default</option>
+          <option value="spice-asc">Spice: Low → High</option>
+          <option value="spice-desc">Spice: High → Low</option>
+          <option value="name-asc">Name: A–Z</option>
+          <option value="rated">My Ratings</option>
+        </select>
+      </div>
     </header>
-    <div id="card-container"></div>
-    <div class="card" style="display: none">
-      <div class="card-content">
-        <h2>TV Show Title</h2>
-        <img src="" alt="TV Show Poster" />
-        <ul>
-          <li>Bullet Point 1</li>
-          <li>Bullet Point 2</li>
-          <li>Bullet Point 3</li>
-        </ul>
+
+    <!-- RESULTS BAR -->
+    <div id="results-bar">
+      <span>Showing <span id="result-count">0</span> dishes</span>
+      <button class="btn-open-modal" onclick="openAddModal()">+ Add Dish</button>
+    </div>
+
+    <!-- FAVORITES SECTION -->
+    <div id="favorites-section" style="display:none">
+      <div class="favorites-inner">
+        <h2 class="section-title">❤️ Your Favorites</h2>
+        <div id="favorites-container"></div>
       </div>
     </div>
-    <div class="footer">
-      <button onclick="quoteAlert()">Get A Quote!</button>
-      <button onclick="removeLastCard()">Remove A Card!</button>
+
+    <!-- MAIN CARD GRID -->
+    <main id="card-container"></main>
+
+    <!-- ADD A DISH -->
+    <div id="add-modal" class="modal-overlay" onclick="closeAddModal(event)">
+      <div class="modal-box">
+        <button class="modal-close" onclick="closeAddModal()">✕</button>
+        <h2 class="section-title"> Add a Dish</h2>
+        <div class="add-form">
+          <input type="text" id="add-name" placeholder="Vietnamese name (e.g. Pho Bo)" />
+          <input type="text" id="add-english" placeholder="English name (e.g. Beef Noodle Soup)" />
+
+          <div class="form-row">
+            <select id="add-region">
+              <option value="North">North</option>
+              <option value="Central">Central</option>
+              <option value="South">South</option>
+            </select>
+            <select id="add-type">
+              <option value="Soup">Soup</option>
+              <option value="Noodles">Noodles</option>
+              <option value="Rice">Rice</option>
+              <option value="Street Food">Street Food</option>
+              <option value="Roll">Roll</option>
+              <option value="Sandwich">Sandwich</option>
+            </select>
+            <select id="add-spice">
+              <option value="1">Spice 1/5</option>
+              <option value="2">Spice 2/5</option>
+              <option value="3">Spice 3/5</option>
+              <option value="4">Spice 4/5</option>
+              <option value="5">Spice 5/5</option>
+            </select>
+          </div>
+
+          <textarea id="add-desc" placeholder="Description..."></textarea>
+          <input type="text" id="add-ingredients" placeholder="Ingredients (comma separated: Rice, Pork, Ginger)" />
+          <input type="text" id="add-funfact" placeholder="Fun fact (optional)" />
+          <input type="text" id="add-image" placeholder="Image URL (optional)" />
+
+          <div class="form-buttons">
+            <button class="btn-add" onclick="addDish()">+ Add Dish</button>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- REMOVE A DISH -->
+    <section class="remove-section">
+      <div class="remove-inner">
+        <select id="remove-select"></select>
+        <button class="btn-remove" onclick="removeCard()">− Remove Selected</button>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <p>Builder: Dat Tang - Snap Engineering Academy 2026</p>
+    </footer>
+
+    <script src="scripts.js"></script>
   </body>
 </html>
